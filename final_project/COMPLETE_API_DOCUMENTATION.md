@@ -1,12 +1,20 @@
 # Express Book Reviews - Complete Testing Documentation
 
 ## Question 1: GitHub Repository Fork
-**Note:** This is a local implementation based on the IBM Developer Skills Network course.
+**cURL Command:**
+```bash
+curl -s https://api.github.com/repos/Yassine-Drira/expressBookReviews | jq '.parent.full_name, .full_name'
+```
+
+**Output:**
+```
+"ibm-developer-skills-network/expressBookReview"
+"Yassine-Drira/expressBookReviews"
+```
 
 Repository Details:
 - Original Repository: `ibm-developer-skills-network/expressBookReview`
-- Local Implementation: Complete Express.js book review API with authentication
-- All endpoints have been successfully implemented
+- Forked Repository: `Yassine-Drira/expressBookReviews`
 
 ---
 
