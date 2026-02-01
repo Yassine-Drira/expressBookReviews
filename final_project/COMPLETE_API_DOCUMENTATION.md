@@ -207,6 +207,16 @@ curl -X DELETE http://localhost:5000/review/1 \
 }
 ```
 
+**Verification - Get Reviews After Delete:**
+```bash
+curl -X GET http://localhost:5000/review/1
+```
+
+**Updated Output:**
+```json
+{}
+```
+
 **Status Code:** 200 OK
 
 ---
