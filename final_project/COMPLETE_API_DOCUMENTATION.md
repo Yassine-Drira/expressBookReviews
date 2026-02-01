@@ -159,16 +159,18 @@ curl -X POST http://localhost:5000/customer/auth/login \
 
 **cURL Command:**
 ```bash
-curl -X PUT http://localhost:5000/customer/auth/review/1 \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNzM5NzYwOTM4LCJleHAiOjE3Mzk3NjQ1Mzh9.h5FPq7xR8LmKpZ9yGhWdF3nQ2tUvA1bJ4cDsE6nMkOs" \
+curl -X PUT http://localhost:5000/review/1 \
   -H "Content-Type: application/json" \
-  -d '{"review":"Excellent classic that everyone should read!"}'
+  -d '{"username":"testuser","review":"Excellent classic that everyone should read!"}'
 ```
 
 **Output:**
 ```json
 {
-  "message": "Review added successfully"
+  "message": "Review added successfully",
+  "reviews": {
+    "testuser": "Excellent classic that everyone should read!"
+  }
 }
 ```
 
@@ -190,19 +192,18 @@ curl -X GET http://localhost:5000/review/1
 
 ## Question 10: Delete Book Review
 
-**Note:** Delete functionality is not yet implemented in the current API version.
-
-**Proposed cURL Command:**
+**cURL Command:**
 ```bash
-curl -X DELETE http://localhost:5000/customer/auth/review/1 \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json"
+curl -X DELETE http://localhost:5000/review/1 \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser"}'
 ```
 
-**Expected Response (When Implemented):**
+**Output:**
 ```json
 {
-  "message": "Review deleted successfully"
+  "message": "Review deleted successfully",
+  "reviews": {}
 }
 ```
 
@@ -212,25 +213,31 @@ curl -X DELETE http://localhost:5000/customer/auth/review/1 \
 
 ## Question 11: Code Implementation in general.js
 
-The [general.js](final_project/router/general.js) file contains all the implementations for retrieving books by various criteria:
+The [general.js](final_project/router/general.js) file contains all the implementations for retrieving books by various criteria, using async/await with Axios:
 
-### Key Code Section - Get Books by Author with .reduce()
+### Key Code Section - Get Books by Author with .reduce() and Axios
 
 ```javascript
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author', async function (req, res) {
   const author = req.params.author.toLowerCase();
-  const booksByAuthor = Object.entries(books).filter(([key, book]) => 
-    book.author.toLowerCase() === author
-  ).reduce((acc, [key, book]) => {
-    acc[key] = book;
-    return acc;
-  }, {});
-  
-  if (Object.keys(booksByAuthor).length > 0) {
-    return res.json(booksByAuthor);
+  try {
+    const response = await axios.get('http://localhost:5000/');
+    const allBooks = response.data;
+    const booksByAuthor = Object.entries(allBooks).filter(([key, book]) => 
+      book.author.toLowerCase() === author
+    ).reduce((acc, [key, book]) => {
+      acc[key] = book;
+      return acc;
+    }, {});
+    
+    if (Object.keys(booksByAuthor).length > 0) {
+      return res.json(booksByAuthor);
+    }
+    return res.status(404).json({ message: "No books found for this author" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error retrieving books by author" });
   }
-  return res.status(404).json({ message: "No books found for this author" });
 });
 ```
 
